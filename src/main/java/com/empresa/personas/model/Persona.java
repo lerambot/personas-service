@@ -17,7 +17,5 @@ public class Persona {
     private String nombre;
     private String apellido;
     private String email;
-    private String dni;
-    private String idProspecto;
-    private String idCliente;
+    private String dni;//
 }
