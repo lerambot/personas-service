@@ -9,10 +9,10 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            steps {
-                git 'https://github.com/lerambot/personas-service.git' // 🔴 cambia si la URL es distinta
-            }
-        }
+    		steps {
+        		git credentialsId: 'github-credentials-id', url: 'https://github.com/lerambot/personas-service.git', branch: 'develop'
+    		}
+		}
 
         stage('Build') {
             steps {
