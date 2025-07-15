@@ -39,7 +39,13 @@ pipeline {
                 }
             }
         }
-    }
+        
+        stage('Deploy to Kubernetes') {
+  			steps {
+    				sh 'kubectl apply -f C:/Users/leandro/Documents/GitHub/personas-service-ops/'
+  				}
+			}
+    	}
 
     post {
         success {
