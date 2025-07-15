@@ -2,7 +2,8 @@ pipeline {
   agent any
 
   parameters {
-    string(name: 'ENVIRONMENT', defaultValue: 'dev', description: 'Nombre del entorno: dev, prod, pre, etc.')
+    choice(name: 'PIPELINE_ACTION', choices: ['build', 'deploy'], description: 'Selecciona la acción: build o deploy')
+    string(name: 'ENVIRONMENT', defaultValue: 'dev', description: 'Nombre del entorno: dev, prod, etc.')
   }
 
   environment {
@@ -19,19 +20,12 @@ pipeline {
     }
 
     stage('Build') {
+      when {
+        expression { params.PIPELINE_ACTION == 'build' }
+      }
       steps {
         sh 'mvn clean package -DskipTests'
-      }
-    }
-
-    stage('Build Docker Image') {
-      steps {
         sh 'docker build -t $IMAGE_NAME .'
-      }
-    }
-
-    stage('Push to Docker Hub') {
-      steps {
         withDockerRegistry([ credentialsId: 'dockerhub-credentials-id', url: '' ]) {
           sh 'docker push $IMAGE_NAME'
         }
@@ -39,6 +33,9 @@ pipeline {
     }
 
     stage('Clone Ops Repo') {
+      when {
+        expression { params.PIPELINE_ACTION == 'deploy' }
+      }
       steps {
         dir('personas-service-ops') {
           git credentialsId: 'github-credentials-id', url: 'https://github.com/lerambot/personas-service-ops.git', branch: 'develop'
@@ -47,6 +44,9 @@ pipeline {
     }
 
     stage('Deploy to Kubernetes') {
+      when {
+        expression { params.PIPELINE_ACTION == 'deploy' }
+      }
       steps {
         sh "kubectl apply -f personas-service-ops/${params.ENVIRONMENT}/"
       }
@@ -55,10 +55,10 @@ pipeline {
 
   post {
     success {
-      echo '✅ Pipeline finalizado con éxito.'
+      echo "✅ Acción '${params.PIPELINE_ACTION}' ejecutada correctamente en entorno '${params.ENVIRONMENT}'."
     }
     failure {
-      echo '❌ El pipeline falló.'
+      echo "❌ Falló la acción '${params.PIPELINE_ACTION}' en entorno '${params.ENVIRONMENT}'."
     }
   }
 }
