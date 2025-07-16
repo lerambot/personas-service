@@ -23,6 +23,12 @@ pipeline {
       when {
         expression { params.PIPELINE_ACTION == 'build' }
       }
+      agent {
+        docker {
+          image 'maven:3.8.5-eclipse-temurin-17'
+          args '-v /var/run/docker.sock:/var/run/docker.sock' // para que el contenedor tenga acceso a Docker
+        }
+      }
       steps {
         sh 'mvn clean package -DskipTests'
         sh 'docker build -t $IMAGE_NAME .'
