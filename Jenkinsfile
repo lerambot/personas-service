@@ -38,7 +38,7 @@ pipeline {
       }
       steps {
         dir('personas-service-ops') {
-          git credentialsId: 'github-credentials-id', url: 'https://github.com/lerambot/personas-service-ops.git', branch: 'develop'
+          git credentialsId: 'github-credentials-id', url: 'https://github.com/lerambot/personas-service-ops.git', branch: 'master'
         }
       }
     }
