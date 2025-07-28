@@ -1,0 +1,11 @@
+FROM jenkins/jenkins:lts
+
+USER root
+RUN apt-get update \
+  && apt-get install -y docker.io \
+  && rm -rf /var/lib/apt/lists/*
+
+# (Opcional) Añade al grupo docker para que jenkins user lo use
+RUN usermod -aG docker jenkins
+
+USER jenkins
