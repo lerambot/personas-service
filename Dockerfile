@@ -5,7 +5,9 @@ FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
 
 # Copia tu jar generado en el contenedor
-COPY target/personas-service-0.0.1-SNAPSHOT.jar app.jar
+# COPY target/personas-service-0.0.1-SNAPSHOT.jar app.jar
+COPY target/*.jar app.jar
+
 
 # Expone el puerto 8080 (ajústalo si tu app usa otro)
 EXPOSE 8080

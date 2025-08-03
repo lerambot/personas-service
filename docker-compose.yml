@@ -1,15 +1,52 @@
+# Opción A: Apuntar a tu Postgres local (fuera de Docker)
+# -----------------------------------------------
+#services:
+#  personas-service:
+#    build: .
+#    #image: lerambot/personas-service:latest
+#    container_name: personas-service
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/seguros_db
+#      SPRING_DATASOURCE_USERNAME: postgres
+#      SPRING_DATASOURCE_PASSWORD: Postgres2025
+#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+
+
+# -----------------------------------------------
+# Opción B: Orquestar también el Postgres dentro de Docker
+# -----------------------------------------------
+version: '3.8'
+
 services:
+  personas-db:
+    image: postgres:14-alpine
+    container_name: personas-db
+    restart: unless-stopped
+    environment: 
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres2025
+      POSTGRES_DB: seguros_db
+    ports:
+      - "5433:5432"
+
   personas-service:
     build: .
-	#image: lerambot/personas-service:latest
     container_name: personas-service
+    depends_on:
+      - personas-db
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/seguros_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://personas-db:5432/seguros_db
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: Postgres2025
+      SPRING_DATASOURCE_PASSWORD: postgres2025
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
 
-	  
+networks:
+  default:
+    driver: bridge
